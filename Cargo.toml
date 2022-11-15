@@ -2,7 +2,6 @@
 name = "pam_saslauthd"
 version = "0.1.0"
 edition = "2021"
-
 authors = [
     "William Brown <william@blackhats.net.au>",
     ]
@@ -10,6 +9,8 @@ rust-version = "1.64"
 license = "MPL-2.0"
 homepage = "https://github.com/Firstyear/pam_saslauthd/"
 repository = "https://github.com/Firstyear/pam_saslauthd/"
+
+links = "pam"
 
 [lib]
 name = "pam_saslauthd"

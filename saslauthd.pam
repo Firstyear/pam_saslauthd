@@ -1,0 +1,6 @@
+auth        sufficient    pam_saslauthd.so ignore_unknown_user debug
+auth        required      pam_deny.so
+# pam_saslauthd can't provide authorisation, account phase isn't used.
+account     sufficient    pam_permit.so
+session     sufficient    pam_permit.so
+password    required      pam_deny.so
