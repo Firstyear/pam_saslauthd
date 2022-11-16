@@ -94,6 +94,8 @@ impl TryFrom<Vec<u8>> for ClientResponse {
         }
         let (input, rem) = right.split_at(count);
 
+        debug_assert!(rem.is_empty());
+
         let response = String::from_utf8(input.into())
             .map_err(|_| {
                 Box::new(IoError::new(ErrorKind::Other, "Invalid UTF8"))
@@ -222,7 +224,7 @@ fn call_daemon_blocking(
 struct Options {
     debug: bool,
     use_first_pass: bool,
-    ignore_unknown_user: bool,
+    // ignore_unknown_user: bool,
 }
 
 impl TryFrom<&Vec<&CStr>> for Options {
@@ -241,7 +243,7 @@ impl TryFrom<&Vec<&CStr>> for Options {
         Ok(Options {
             debug: gopts.contains("debug"),
             use_first_pass: gopts.contains("use_first_pass"),
-            ignore_unknown_user: gopts.contains("ignore_unknown_user"),
+            // ignore_unknown_user: gopts.contains("ignore_unknown_user"),
         })
     }
 }
@@ -250,7 +252,7 @@ struct PamSaslauthd;
 pam_hooks!(PamSaslauthd);
 
 impl PamHooks for PamSaslauthd {
-    fn acct_mgmt(pamh: &PamHandle, args: Vec<&CStr>, _flags: PamFlag) -> PamResultCode {
+    fn acct_mgmt(_pamh: &PamHandle, args: Vec<&CStr>, _flags: PamFlag) -> PamResultCode {
         let opts = match Options::try_from(&args) {
             Ok(o) => o,
             Err(_) => return PamResultCode::PAM_SERVICE_ERR,
@@ -389,7 +391,7 @@ impl PamHooks for PamSaslauthd {
         PamResultCode::PAM_IGNORE
     }
 
-    fn sm_open_session(pamh: &PamHandle, args: Vec<&CStr>, _flags: PamFlag) -> PamResultCode {
+    fn sm_open_session(_pamh: &PamHandle, args: Vec<&CStr>, _flags: PamFlag) -> PamResultCode {
         let opts = match Options::try_from(&args) {
             Ok(o) => o,
             Err(_) => return PamResultCode::PAM_SERVICE_ERR,
