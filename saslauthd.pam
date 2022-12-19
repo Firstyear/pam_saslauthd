@@ -1,5 +1,7 @@
-auth        sufficient    pam_saslauthd.so debug
+# Append "debug" to this line if you need more info.
+auth        sufficient    pam_saslauthd.so
 auth        required      pam_deny.so
-# pam_saslauthd can't provide authorisation, account phase isn't used.
+# pam_saslauthd can't provide authorisation so this doesn't enforce rules, but it is required
+# to open a valid session for the pam checks.
 account     sufficient    pam_permit.so
 session     sufficient    pam_permit.so

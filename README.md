@@ -8,9 +8,9 @@ a backend for [389-ds](https://github.com/389ds/389-ds-base/) and it's pam-pass-
 
 ## Configuration with 389-DS
 
-    dsconf localhost plugin pass-through-auth pam-config saslauthd add --include-suffix dc=dev \
+    dsconf localhost plugin pam-pass-through-auth config saslauthd add --include-suffix dc=dev \
         --id-attr sasl_uid --service saslauthd --fallback false --id_map_method ENTRY
-    dsconf localhost plugin set "PAM Pass Through Auth" --enabled on
+    dsconf localhost plugin pam-pass-through-auth enable
     systemctl restart dirsrv@localhost
 
 See saslauthd.pam for an example of the pam.d file you need.
