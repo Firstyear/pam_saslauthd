@@ -50,7 +50,8 @@ impl ClientRequest {
             self.realm.len() +
             self.client_addr.len() +
             // Add 2 * 5 for the u16 counts.
-            10);
+            10,
+        );
 
         buf.extend_from_slice(&(self.login_id.len() as u16).to_be_bytes());
         buf.extend_from_slice(self.login_id.as_bytes());
@@ -73,7 +74,7 @@ impl ClientRequest {
 
 #[derive(Debug)]
 struct ClientResponse {
-    valid: bool
+    valid: bool,
 }
 
 impl TryFrom<Vec<u8>> for ClientResponse {
@@ -97,9 +98,7 @@ impl TryFrom<Vec<u8>> for ClientResponse {
         debug_assert!(rem.is_empty());
 
         let response = String::from_utf8(input.into())
-            .map_err(|_| {
-                Box::new(IoError::new(ErrorKind::Other, "Invalid UTF8"))
-            })?;
+            .map_err(|_| Box::new(IoError::new(ErrorKind::Other, "Invalid UTF8")))?;
 
         if response == "OK" {
             Ok(ClientResponse { valid: true })
@@ -339,12 +338,10 @@ impl PamHooks for PamSaslauthd {
         // https://github.com/cyrusimap/cyrus-sasl/blob/master/saslauthd/ipc_unix.c#L328
 
         let (login_id, realm) = match account_id.split_once('@') {
-            Some((lid, rlm)) => {
-                (lid.to_string(), rlm.to_string())
-            }
+            Some((lid, rlm)) => (lid.to_string(), rlm.to_string()),
             None => {
-                println!("pam_saslauthd requires user@realm formatted username");
-                return PamResultCode::PAM_AUTH_ERR;
+                // If there is no realm, leave it as a blank str.
+                (account_id.to_string(), String::new())
             }
         };
 
@@ -353,7 +350,7 @@ impl PamHooks for PamSaslauthd {
             password: authtok,
             service: "pam_saslauthd".to_string(),
             realm,
-            client_addr: "::1".to_string()
+            client_addr: "::1".to_string(),
         };
 
         match call_daemon_blocking(SOCKET, &req, UNIX_SOCK_TIMEOUT, opts.debug) {
@@ -436,5 +433,3 @@ impl PamHooks for PamSaslauthd {
         PamResultCode::PAM_SUCCESS
     }
 }
-
-
